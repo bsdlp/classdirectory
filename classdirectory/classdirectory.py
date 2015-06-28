@@ -1,4 +1,3 @@
-import re
 import types
 
 
@@ -17,29 +16,22 @@ class ClassDirectory(object):
         :param parent: The parent object.
         :type  parent: ``type``
 
-        :param regex: Regular expression that will match object names.
-        :type  regex: ``str``
+        :param regex: Compiled regex object that will match object names.
+        :type  regex: compiled regex object
 
         :return matched_objects: List of matching objects.
         :rtype  matched_objects: ``list``
         """
         matched_objects = []
 
-        if regex is not None:
-            regex = re.compile(regex)
-
         for i in dir(self.module):
             obj = getattr(self.module, i)
             filter_values = []
             filter_values.extend([isinstance(obj, type) and issubclass(obj, parent)])
 
-            # NoneType has no attribute search
-            try:
+            if regex:
                 match = regex.search(i)
-            except AttributeError:
-                match = True
-
-            filter_values.append(match)
+                filter_values.append(match)
 
             if all(filter_values):
                 matched_objects.append(obj)
