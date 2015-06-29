@@ -1,12 +1,15 @@
+from collections import namedtuple
 import types
 
 
 class ClassDirectory(object):
     def __init__(self, module):
-        if type(module) == types.ModuleType:
+        if isinstance(module, types.ModuleType):
             self.module = module
         else:
             raise TypeError("{} is not a module.".format(module))
+
+        self.filters = ['inheritance', 'regex']
 
     def find(self, parent=object, regex=None):
         """
@@ -22,18 +25,29 @@ class ClassDirectory(object):
         :return matched_objects: List of matching objects.
         :rtype  matched_objects: ``list``
         """
-        matched_objects = []
+        self.parent = parent
 
-        for i in dir(self.module):
-            obj = getattr(self.module, i)
-            filter_values = []
-            filter_values.extend([isinstance(obj, type) and issubclass(obj, parent)])
+        regex.search('')  # test if regex object implements search
+        self.regex = regex
 
-            if regex:
-                match = regex.search(i)
-                filter_values.append(match)
+        Suspect = namedtuple('Suspect', ['name', 'object'])
+        suspects = (
+            Suspect(name=i, object=getattr(self.module, i))
+            for i in dir(self.module)
+        )
 
-            if all(filter_values):
-                matched_objects.append(obj)
+        matched_objects = [i.object for i in self._filter(suspects)]
 
         return matched_objects
+
+    def _filter(self, suspects):
+        for f in self.filters:
+            filter_method = getattr(self, "_{}_filter".format(f))
+            suspects = filter(filter_method, suspects)
+        return suspects
+
+    def _inheritance_filter(self, s):
+        return isinstance(s.object, type) and issubclass(s.object, self.parent)
+
+    def _regex_filter(self, suspect):
+        return self.regex.search(suspect.name) is not None
