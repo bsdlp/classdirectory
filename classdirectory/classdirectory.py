@@ -1,4 +1,5 @@
 from collections import namedtuple
+import re
 import types
 
 
@@ -19,16 +20,15 @@ class ClassDirectory(object):
         :param parent: The parent object.
         :type  parent: ``type``
 
-        :param regex: Compiled regex object that will match object names.
-        :type  regex: compiled regex object
+        :param regex: Regex string.
+        :type  regex: ``str``
 
         :return matched_objects: List of matching objects.
         :rtype  matched_objects: ``list``
         """
         self.parent = parent
 
-        regex.search('')  # test if regex object implements search
-        self.regex = regex
+        self.regex = re.compile(regex)
 
         Suspect = namedtuple('Suspect', ['name', 'object'])
         suspects = (
