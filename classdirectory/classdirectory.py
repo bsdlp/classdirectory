@@ -56,7 +56,9 @@ class ClassDirectory(object):
         """
         Check that the suspect is not the parent.
         """
-        return suspect is not self.parent
+        if suspect is self.parent:
+            return False
+        return True
 
     def _regex_filter(self, suspect):
         """
