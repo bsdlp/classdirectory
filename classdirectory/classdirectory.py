@@ -47,6 +47,9 @@ class ClassDirectory(object):
         return suspects
 
     def _inheritance_filter(self, s):
+        """
+        Check that the suspect inherits from provided parent class.
+        """
         return isinstance(s.object, type) and issubclass(s.object, self.parent)
 
     def _parent_filter(self, suspect):
@@ -56,4 +59,7 @@ class ClassDirectory(object):
         return suspect is not self.parent
 
     def _regex_filter(self, suspect):
+        """
+        Check that suspect object's name matches provided regex.
+        """
         return self.regex.search(suspect.name) is not None
