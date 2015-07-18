@@ -10,7 +10,7 @@ class ClassDirectory(object):
         else:
             raise TypeError("{} is not a module.".format(module))
 
-        self.filters = ['inheritance', 'regex']
+        self.filters = ['inheritance', 'regex', 'parent']
 
     def find(self, parent=object, regex=None):
         """
@@ -48,6 +48,12 @@ class ClassDirectory(object):
 
     def _inheritance_filter(self, s):
         return isinstance(s.object, type) and issubclass(s.object, self.parent)
+
+    def _parent_filter(self, suspect):
+        """
+        Check that the suspect is not the parent.
+        """
+        return suspect is not self.parent
 
     def _regex_filter(self, suspect):
         return self.regex.search(suspect.name) is not None
